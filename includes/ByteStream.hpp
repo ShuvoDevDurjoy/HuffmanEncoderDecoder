@@ -47,6 +47,10 @@ public:
         return 0;
     }
 
+    size_t size(){
+        return data.size();
+    }
+
     void to_string(){
         size_t t = data.size();
 
@@ -57,7 +61,5 @@ public:
             push_byte(front);
             t--;
         }
-
-        // std::cout << "<<< padding: " << get_pad() << std::endl;
     }
 };

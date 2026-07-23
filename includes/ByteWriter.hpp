@@ -20,9 +20,14 @@ public:
 
 private: 
     bool _write(Byte &byte){
+        _write(byte.get_byte());
+        return true;
+    }
+
+    bool _write(uint8_t byte){
         if(is_open()){
-            uint8_t b = byte.get_byte();
-            file.write(reinterpret_cast<const char *>(&b), sizeof(b));
+            // std::cout<<" "<<std::bitset<8>(byte);
+            file.write(reinterpret_cast<const char *>(&byte), sizeof(byte));
             return file.good();
         }
         return false;
@@ -39,6 +44,10 @@ public:
 public: 
     bool write(Byte &b){
         return _write(b);
+    }
+
+    bool write(uint8_t &c){
+        return _write(c);
     }
 
     bool write(ByteStream &bs)

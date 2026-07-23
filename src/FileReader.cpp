@@ -1,8 +1,9 @@
 #include "../includes/FileReader.hpp"
 
 bool FileReader::open(std::string file_name){
-    file.open(file_name, std::ios::binary);
+    file.open(file_name, std::ios::in | std::ios::binary);
     bytes_read = 0;
+    index = 0;
     return is_open();
 }
 
@@ -31,11 +32,7 @@ bool FileReader::is_buffer_empty(){
 
 bool FileReader::can_read(){
     bool can_read = !is_buffer_empty() || (is_open() && (!file.eof()));
-    if (!can_read)
-    {
-        close();
-    }
-    else{
+    if(can_read){
         if(is_buffer_empty()){
             return read_chunk();
         }

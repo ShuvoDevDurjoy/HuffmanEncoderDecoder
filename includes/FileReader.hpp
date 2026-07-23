@@ -23,6 +23,16 @@ public:
     bool is_open() const;
     void close();
     bool open(std::string file_name);
+    bool reset(){
+        if(!is_open()){
+            return false;
+        };
+        file.clear();
+        file.seekg(0, std::ios::beg);
+        bytes_read = 0;
+        index = 0;
+        return !file.fail() && file.tellg() == std::streampos(0);
+    }
 
 public:
     bool read_chunk();

@@ -10,6 +10,9 @@
 #include "ByteWriter.hpp"
 #include "Byte.hpp"
 #include <string>
+#include "File.hpp"
+#include "Utils.hpp"
+#include <algorithm>
 
 class Encoder
 {
@@ -24,11 +27,9 @@ private:
     std::uint8_t padding = 0;
 
 private:
-    bool _write_version_number();
-    bool _write_num_unique_chars(uint16_t nc);
-    bool _write_unique_codes(std::array<uint64_t, BYTE_SIZE> &freq);
-
-    bool _write_content_of_file(std::array<ByteStream, BYTE_SIZE> &codes);
+    bool _encode(EncodedContent &content);
+    bool _encode_content(std::array<ByteStream, BYTE_SIZE> &codes, ByteStream &bs);
+    void _build_frequency_map(std::array<TYPE_FREQUENCY, BYTE_SIZE> &freq, uint16_t &num_unique_chars, uint8_t &min_num_bytes, FileReader *reader);
 
 public:
     Encoder()
@@ -37,5 +38,5 @@ public:
         out_file = new ByteWriter();
     };
 
-    bool encode(std::string in_file, std::string out_file, std::array<uint64_t, BYTE_SIZE> &freq, std::array<ByteStream, BYTE_SIZE> &codes, uint16_t num_uni_chars = 0);
+    bool encode(std::string in_file, std::string out_file);
 };
