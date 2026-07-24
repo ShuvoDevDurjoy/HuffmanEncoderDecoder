@@ -4,22 +4,38 @@ A command-line Huffman encoder and decoder for binary files.
 
 ## Install
 
+Linux:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/main/install.sh | bash
 ```
 
-The installer downloads the latest GitHub Release binary and places it at `~/.local/bin/huff`. Make sure that directory is in your PATH:
+Windows PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/main/install.ps1 | iex
+```
+
+The installer downloads the latest GitHub Release binary. On Linux it places `huff` at `~/.local/bin/huff`. Make sure that directory is in your PATH:
 
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-The release installer currently supports Linux x86_64.
+On Windows it places `huff.exe` in `%LOCALAPPDATA%\Programs\huff\bin` and adds that directory to your user PATH. Open a new PowerShell window after installing.
 
-To install a specific release or use another location:
+The release installers currently support Linux x86_64 and Windows x86_64.
+
+To install a specific Linux release or use another location:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/main/install.sh | HUFF_VERSION=v1.0.0 PREFIX=/usr/local bash
+```
+
+For Windows:
+
+```powershell
+$env:HUFF_VERSION = "v1.0.0"; irm https://raw.githubusercontent.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/main/install.ps1 | iex
 ```
 
 ## Usage
@@ -64,4 +80,4 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-GitHub Actions will build `huff-linux-x86_64.tar.gz`, attach it to the release, and the one-line installer will start using it as the latest release.
+GitHub Actions will build `huff-linux-x86_64.tar.gz` and `huff-windows-x86_64.zip`, attach them to the release, and the one-line installers will start using that release as the latest version.

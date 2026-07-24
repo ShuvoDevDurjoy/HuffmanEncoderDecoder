@@ -169,7 +169,7 @@ namespace Utils{
 
     uint8_t min_byte_count(uint64_t nc) {
         if (nc == 0) return 1;
-        uint8_t bits = 64 - __builtin_clzll(nc);
+        uint8_t bits = static_cast<uint8_t>(std::bit_width(nc));
         return (bits + 7) / 8;
     }
 

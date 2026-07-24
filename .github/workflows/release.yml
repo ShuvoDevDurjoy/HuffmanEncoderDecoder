@@ -35,8 +35,40 @@ jobs:
             huff-linux-x86_64.tar.gz
             huff-linux-x86_64.tar.gz.sha256
 
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build
+        shell: cmd
+        run: cl /std:c++20 /EHsc /O2 main.cpp /Fe:huff.exe
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $asset = "huff-windows-x86_64"
+          Compress-Archive -Path huff.exe -DestinationPath "$asset.zip" -Force
+          $hash = (Get-FileHash "$asset.zip" -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $asset.zip" | Out-File "$asset.zip.sha256" -Encoding ascii
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: huff-windows-x86_64
+          path: |
+            huff-windows-x86_64.zip
+            huff-windows-x86_64.zip.sha256
+
   publish:
-    needs: build-linux
+    needs:
+      - build-linux
+      - build-windows
     runs-on: ubuntu-latest
 
     steps:
@@ -50,8 +82,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           files=$(find dist -type f | sort)
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" $files --clobber
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" $files --clobber --repo "$GITHUB_REPOSITORY"
           else
-            gh release create "$GITHUB_REF_NAME" $files --title "$GITHUB_REF_NAME" --generate-notes
+            gh release create "$GITHUB_REF_NAME" $files --title "$GITHUB_REF_NAME" --generate-notes --repo "$GITHUB_REPOSITORY"
           fi
