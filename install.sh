@@ -55,6 +55,8 @@ release_url() {
     fi
 }
 
+_tmpdir=""
+
 main() {
     command -v tar >/dev/null 2>&1 || fail "tar is required"
     command -v install >/dev/null 2>&1 || fail "install is required"
@@ -63,22 +65,22 @@ main() {
     local url
     asset="$(platform_asset)"
     url="$(release_url "$asset")"
-    HUFF_TMPDIR="$(mktemp -d)"
-    trap 'rm -rf "$HUFF_TMPDIR"' EXIT
+    _tmpdir="$(mktemp -d)"
+    trap 'rm -rf "$_tmpdir"' EXIT
 
-    download "$url" "$HUFF_TMPDIR/$asset"
+    download "$url" "$_tmpdir/$asset"
 
     if command -v sha256sum >/dev/null 2>&1; then
-        if download "$url.sha256" "$HUFF_TMPDIR/$asset.sha256"; then
-            (cd "$HUFF_TMPDIR" && sha256sum -c "$asset.sha256" >/dev/null)
+        if download "$url.sha256" "$_tmpdir/$asset.sha256"; then
+            (cd "$_tmpdir" && sha256sum -c "$asset.sha256" >/dev/null)
         fi
     fi
 
-    tar -xzf "$HUFF_TMPDIR/$asset" -C "$HUFF_TMPDIR"
-    [ -f "$HUFF_TMPDIR/huff" ] || fail "release archive did not contain huff"
+    tar -xzf "$_tmpdir/$asset" -C "$_tmpdir"
+    [ -f "$_tmpdir/huff" ] || fail "release archive did not contain huff"
 
     install -d "$BINDIR"
-    install -m 755 "$HUFF_TMPDIR/huff" "$BINDIR/$BIN_NAME"
+    install -m 755 "$_tmpdir/huff" "$BINDIR/$BIN_NAME"
 
     printf 'installed %s to %s\n' "$BIN_NAME" "$BINDIR/$BIN_NAME"
 
