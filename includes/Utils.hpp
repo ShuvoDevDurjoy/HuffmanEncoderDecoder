@@ -12,6 +12,7 @@
 #include "../Utils/Type.hpp"
 #include <cstdint>
 #include <bit>
+#include <bitset>
 #include <algorithm>
 #include <sstream>
 #include <string>
@@ -169,7 +170,12 @@ namespace Utils{
 
     uint8_t min_byte_count(uint64_t nc) {
         if (nc == 0) return 1;
-        uint8_t bits = static_cast<uint8_t>(std::bit_width(nc));
+        uint8_t bits = 0;
+        uint64_t temp = nc;
+        while (temp > 0) {
+            bits++;
+            temp >>= 1;
+        }
         return (bits + 7) / 8;
     }
 
