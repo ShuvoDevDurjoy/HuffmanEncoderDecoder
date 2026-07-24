@@ -36,17 +36,12 @@ public:
     }
 
 public:
-    void encode(std::string in_file_name, std::string out_file_name){
-        if (reader->open(in_file_name) && writer->open(out_file_name))
-        {
-            this->enc->encode(in_file_name, out_file_name);
-        }
-        reader->close();
-        writer->close();
+    bool encode(std::string in_file_name, std::string out_file_name){
+        return this->enc->encode(in_file_name, out_file_name);
     }
 
-    void decode(std::string in_file_name, std::string out_file_name){
-        dec->decode(in_file_name, out_file_name);
+    bool decode(std::string in_file_name, std::string out_file_name){
+        return dec->decode(in_file_name, out_file_name);
     }
 
 };

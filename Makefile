@@ -1,0 +1,22 @@
+CXX ?= g++
+CXXFLAGS ?= -std=c++20 -Wall -Wextra -O2
+TARGET := huff
+PREFIX ?= $(HOME)/.local
+BINDIR ?= $(PREFIX)/bin
+
+all: $(TARGET)
+
+$(TARGET): main.cpp includes/*.hpp Utils/*.hpp src/*.cpp
+	$(CXX) $(CXXFLAGS) main.cpp -o $(TARGET)
+
+install: $(TARGET)
+	install -d "$(DESTDIR)$(BINDIR)"
+	install -m 755 "$(TARGET)" "$(DESTDIR)$(BINDIR)/$(TARGET)"
+
+uninstall:
+	rm -f "$(DESTDIR)$(BINDIR)/$(TARGET)"
+
+clean:
+	rm -f $(TARGET)
+
+.PHONY: all install uninstall clean

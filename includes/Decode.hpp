@@ -11,6 +11,7 @@
 #include "Node.hpp"
 #include "ByteStream.hpp"
 #include "File.hpp"
+#include "Utils.hpp"
 
 class Decode
 {
@@ -31,7 +32,6 @@ private:
     bool _read_chars(std::array<TYPE_FREQUENCY,BYTE_SIZE> &freq, uint16_t uni_chars, uint8_t max_freq_byte_size)
     {
         size_t num_iter = static_cast<size_t>(uni_chars);
-        size_t max_byte_read = static_cast<size_t>(max_freq_byte_size);
         uint8_t byte = 0;
         uint64_t f = 0;
         for (size_t i = 0; i < num_iter; ++i)
@@ -40,6 +40,10 @@ private:
             if (reader->next_byte(byte) && Utils::read_uint64_t(reader, f, max_freq_byte_size))
             {
                 freq[byte] = f;
+            }
+            else
+            {
+                return false;
             }
         }
         return true;
@@ -56,11 +60,31 @@ private:
 
     void _decode(ByteStream &bs, Node *root, ByteStream &content)
     {
+        if(!root)
+            return;
+
+        if(root->is_leaf())
+        {
+            Byte byte;
+            bool bit = false;
+
+            while (!bs.is_empty())
+            {
+                bs.pop_byte(byte);
+
+                while (!byte.is_empty())
+                {
+                    byte.pop_bit_front(bit);
+                    content.push_byte(root->c);
+                }
+            }
+            return;
+        }
+
         Node *current = root;
 
         Byte byte;
-        bool bit;
-        // bs.to_string();
+        bool bit = false;
 
         while (!bs.is_empty())
         {
@@ -87,55 +111,57 @@ private:
 public:
     bool decode(std::string in_file, std::string out_file)
     {
-        std::cout << "******* Starting Decoding ************" << std::endl;
         writer->open(out_file);
         reader->open(in_file);
 
+        auto fail = [&](){
+            writer->close();
+            reader->close();
+            return false;
+        };
 
-        if (writer->is_open() && reader->is_open())
+        if (!(writer->is_open() && reader->is_open()))
         {
-
-            DecodedContent content = DecodedContent();
-            std::array<TYPE_FREQUENCY, BYTE_SIZE> freq;
-            freq.fill(0);
-
-            bool success;
-            success = Utils::read_uint8_t(reader, content.version_number);
-            if (!success)
-            return false;
-            success = Utils::read_uint16_t(reader, content.num_unique_chars);
-            if (!success)
-                return false;
-            success = Utils::read_uint8_t(reader, content.max_freq_byte_size);
-            if (!success)
-                return false;
-            success = _read_chars(freq, content.num_unique_chars, content.max_freq_byte_size);
-            // show_freq(freq);
-            if (!success)
-            return false;
-            success = reader->next_byte(content.padding);
-            if (!success)
-            return false;
-            Node *root = Utils::build_huffman_tree(freq);
-            if(!root)
-                return false;
-            ByteStream code;
-            // traverse(root, code);
-            ByteStream bs;
-            _read_code_stream(bs);
-            if(bs.size()==0)
-                return false;
-            bs.padding_back(content.padding);
-            // ByteStream content;
-            _decode(bs, root, content.content_codes);
-            writer->write(content.content_codes);
+            return fail();
         }
 
-        std::cout << "\n************Decoding Complete*****************\n" << std::endl;
+        DecodedContent content = DecodedContent();
+        std::array<TYPE_FREQUENCY, BYTE_SIZE> freq;
+        freq.fill(0);
+
+        bool success;
+        success = Utils::read_uint8_t(reader, content.version_number);
+        if (!success)
+            return fail();
+        success = Utils::read_uint16_t(reader, content.num_unique_chars);
+        if (!success)
+            return fail();
+        success = Utils::read_uint8_t(reader, content.max_freq_byte_size);
+        if (!success)
+            return fail();
+        success = _read_chars(freq, content.num_unique_chars, content.max_freq_byte_size);
+        if (!success)
+            return fail();
+        success = reader->next_byte(content.padding);
+        if (!success)
+            return fail();
+
+        Node *root = Utils::build_huffman_tree(freq);
+        if(!root)
+            return fail();
+
+        ByteStream bs;
+        _read_code_stream(bs);
+        if(bs.size()==0)
+            return fail();
+
+        bs.padding_back(content.padding);
+        _decode(bs, root, content.content_codes);
+        success = writer->write(content.content_codes);
 
         writer->close();
         reader->close();
 
-        return true;
+        return success;
     }
 };

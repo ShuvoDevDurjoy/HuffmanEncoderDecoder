@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Byte.hpp"
+#include "ByteStream.hpp"
 #include <fstream>
 
 class ByteWriter{

@@ -2,13 +2,20 @@
 
 #include <array>
 
+#include <cctype>
+#include <filesystem>
+#include <iomanip>
 #include <iostream>
+#include "ByteStream.hpp"
 #include "FileReader.hpp"
 #include "Node.hpp"
 #include "../Utils/Type.hpp"
 #include <cstdint>
 #include <bit>
 #include <algorithm>
+#include <sstream>
+#include <string>
+#include <system_error>
 
 struct Compare{
     bool operator()(Node* a, Node* b){
@@ -17,6 +24,97 @@ struct Compare{
 };
 
 namespace Utils{
+
+    std::string trim(const std::string &value){
+        auto start = std::find_if_not(value.begin(), value.end(), [](unsigned char c){
+            return std::isspace(c);
+        });
+
+        auto end = std::find_if_not(value.rbegin(), value.rend(), [](unsigned char c){
+            return std::isspace(c);
+        }).base();
+
+        if(start >= end){
+            return "";
+        }
+
+        return std::string(start, end);
+    }
+
+    std::string to_lower(std::string value){
+        std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c){
+            return static_cast<char>(std::tolower(c));
+        });
+        return value;
+    }
+
+    bool file_exists(const std::string &path){
+        std::error_code ec;
+        return std::filesystem::exists(path, ec) && std::filesystem::is_regular_file(path, ec);
+    }
+
+    bool output_parent_exists(const std::string &path){
+        std::filesystem::path out_path(path);
+        std::filesystem::path parent = out_path.parent_path();
+
+        if(parent.empty()){
+            return true;
+        }
+
+        std::error_code ec;
+        return std::filesystem::exists(parent, ec) && std::filesystem::is_directory(parent, ec);
+    }
+
+    uintmax_t file_size(const std::string &path){
+        std::error_code ec;
+        uintmax_t size = std::filesystem::file_size(path, ec);
+        return ec ? 0 : size;
+    }
+
+    std::string format_file_size(uintmax_t bytes){
+        const char* units[] = {"B", "KB", "MB", "GB", "TB"};
+        double size = static_cast<double>(bytes);
+        int unit = 0;
+
+        while(size >= 1024.0 && unit < 4){
+            size /= 1024.0;
+            unit++;
+        }
+
+        std::ostringstream out;
+        if(unit == 0){
+            out << bytes << " " << units[unit];
+        }
+        else{
+            out << std::fixed << std::setprecision(size < 10.0 ? 2 : 1) << size << " " << units[unit];
+        }
+
+        return out.str();
+    }
+
+    std::string encoded_output_path(const std::string &input_file){
+        return input_file + ".huff";
+    }
+
+    std::string format_size_change(uintmax_t input_size, uintmax_t output_size){
+        if(input_size == 0){
+            return "n/a";
+        }
+
+        double change = (static_cast<double>(output_size) - static_cast<double>(input_size)) * 100.0
+                        / static_cast<double>(input_size);
+
+        std::ostringstream out;
+        out << std::fixed << std::setprecision(2);
+        if(change > 0){
+            out << "+" << change << "%";
+        }
+        else{
+            out << change << "%";
+        }
+
+        return out.str();
+    }
 
     int byte_count(int num){
         int count = 0;
@@ -119,8 +217,6 @@ namespace Utils{
             freq[next_byte]++;
         }
 
-        std::cout << (int)num_unique_chars << std::endl;
-
         auto max_freq_size = std::max_element(freq.begin(), freq.end());
         uint64_t max_frequency = *max_freq_size;
 
@@ -176,6 +272,9 @@ namespace Utils{
             return;
         if (root->is_leaf())
         {
+            if(code.is_empty()){
+                code.push_bit(false);
+            }
             huffman_codes[root->c] = code;
             return;
         }

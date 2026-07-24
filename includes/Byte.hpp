@@ -36,9 +36,9 @@ public:
         return false;
     }
 
-    void push(uint8_t p_byte, size_t padding = 0){
+    void push(uint8_t p_byte, size_t p_padding = 0){
         byte = p_byte;
-        padding = 0;
+        padding = p_padding;
     }
 
     bool pop(bool &bit){
