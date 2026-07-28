@@ -5,7 +5,9 @@ TARGET := huff
 PREFIX ?= $(HOME)/.local
 BINDIR ?= $(PREFIX)/bin
 
-all: $(TARGET)
+all: build
+
+build: $(TARGET)
 
 $(TARGET): main.cpp includes/*.hpp src/*.cpp
 	$(CXX) $(CXXFLAGS) main.cpp src/*.cpp -o $(TARGET)
@@ -20,4 +22,4 @@ uninstall:
 clean:
 	rm -f $(TARGET)
 
-.PHONY: all install uninstall clean
+.PHONY: all build install uninstall clean

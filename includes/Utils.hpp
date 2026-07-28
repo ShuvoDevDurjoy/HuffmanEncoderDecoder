@@ -2,6 +2,8 @@
 
 #include <bit>
 #include <array>
+#include <queue>
+#include <vector>
 #include <bitset>
 #include <string>
 #include <cctype>

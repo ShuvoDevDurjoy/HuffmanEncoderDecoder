@@ -225,7 +225,7 @@ namespace Utils
     bool read_uint64_t(FileReader *reader, uint64_t &f, size_t max_read)
     {
         size_t max_byte_read = 8;
-        max_read = std::max(static_cast<size_t>(0), std::min(max_read, max_byte_read));
+        max_read = (std::max)(static_cast<size_t>(0), (std::min)(max_read, max_byte_read));
         uint8_t byte;
         f = 0;
         while (max_read && reader->next_byte(byte))
