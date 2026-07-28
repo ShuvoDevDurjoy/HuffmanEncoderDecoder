@@ -6,7 +6,7 @@
 #include <fstream>
 #include <filesystem>
 
-#include "Type.hpp"
+#include "Config.hpp"
 #include "Utils.hpp"
 
 class FileReader

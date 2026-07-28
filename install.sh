@@ -39,6 +39,12 @@ platform_asset() {
         Linux:x86_64|Linux:amd64)
             printf 'huff-linux-x86_64.tar.gz'
             ;;
+        Darwin:x86_64|Darwin:amd64)
+            printf 'huff-macos-x86_64.tar.gz'
+            ;;
+        Darwin:arm64|Darwin:aarch64)
+            printf 'huff-macos-arm64.tar.gz'
+            ;;
         *)
             fail "unsupported platform: $os $arch"
             ;;

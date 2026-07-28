@@ -13,13 +13,13 @@
 #include "ByteStream.hpp"
 #include "FileReader.hpp"
 #include "ByteWriter.hpp"
-#include "Type.hpp"
+#include "Config.hpp"
 #include "Utils.hpp"
 
 class Encoder
 {
 private:
-    std::string encoder_magic_code = "HUFF";
+    std::string encoder_magic_code = MAGIC_CODE;
     ByteWriter *out_file;
     FileReader *in_file;
     uint8_t version = 1;
@@ -42,6 +42,12 @@ public:
         in_file = new FileReader();
         out_file = new ByteWriter();
     };
+
+    ~Encoder()
+    {
+        delete in_file;
+        delete out_file;
+    }
 
     bool encode(std::string in_file, std::string out_file);
 

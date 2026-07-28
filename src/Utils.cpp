@@ -28,9 +28,9 @@ namespace Utils
     std::string get_truncated_file_name(const std::filesystem::path &p)
     {
         std::string name = trim(p.stem().string());
-        if (name.size() > 50)
+        if (name.size() > MAX_FILE_NAME_SIZE)
         {
-            name = name.substr(0, 50);
+            name = name.substr(0, MAX_FILE_NAME_SIZE);
         }
         return name;
     }
@@ -159,11 +159,11 @@ namespace Utils
         {
             if (parent_path.empty())
             {
-                output_file = get_truncated_file_name(input_file) + ".huff";
+                output_file = get_truncated_file_name(input_file) + ENCODER_FILE_EXTENSION;
             }
             else
             {
-                output_file = (parent_path / (get_truncated_file_name(input_file) + ".huff")).string();
+                output_file = (parent_path / (get_truncated_file_name(input_file) + ENCODER_FILE_EXTENSION)).string();
             }
             return true;
         }
@@ -266,14 +266,10 @@ namespace Utils
 
     bool uint16_t_to_bytestream(uint16_t nc, ByteStream &bs)
     {
-        uint16_t ext = 0 | 0xFF;
-        ext <<= 8;
-        for (int i = 0; i < 2; ++i)
-        {
-            uint8_t byte = (nc & ext) >> 8;
-            nc <<= 8;
-            bs.push_byte(byte);
-        }
+        uint8_t high_byte = static_cast<uint8_t>((nc >> 8) & 0xFF);
+        uint8_t low_byte = static_cast<uint8_t>(nc & 0xFF);
+        bs.push_byte(high_byte);
+        bs.push_byte(low_byte);
         return true;
     }
 
@@ -284,12 +280,17 @@ namespace Utils
         bool success = Utils::read_uint8_t(reader, size) && read_n_bytes_into_stream(reader, stream, size) && convert_stream_to_string(stream, out_string);
         return success;
     }
+    bool read_string2(FileReader *reader, std::string &out_string)
+    {
+        uint16_t size = 0;
+        ByteStream stream;
+        bool success = Utils::read_uint16_t(reader, size) && read_n_bytes_into_stream(reader, stream, size) && convert_stream_to_string(stream, out_string);
+        return success;
+    }
 
     bool frequency_to_stream(std::array<TYPE_FREQUENCY, BYTE_SIZE> &freq, ByteStream &bs, uint8_t min_bytes)
     {
         Terminal::stat_carriage("Converting Frequecy Bytes to Stream", Status::Modern::PROGRESS);
-        uint64_t ext = 0 | 0xFF;
-        ext <<= 56;
         for (size_t i = 0; i < freq.size(); ++i)
         {
             if (freq[i])

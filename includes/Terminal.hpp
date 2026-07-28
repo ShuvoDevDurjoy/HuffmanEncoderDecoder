@@ -15,7 +15,6 @@
 namespace Status
 {
 
-    // --- Option 1: Modern Unicode Icons (Great for macOS, Linux & Windows Terminal) ---
     namespace Modern
     {
         constexpr std::string_view SUCCESS = " \033[1;32m✔ SUCCESS\033[0m";
@@ -29,7 +28,6 @@ namespace Status
         constexpr std::string_view RETRYING = " \033[1;35m⟳ RETRYING\033[0m";
     }
 
-    // --- Option 2: Compact Square Badges (100% Compatible with older ASCII terminals) ---
     namespace Badge
     {
         constexpr std::string_view SUCCESS = " \033[1;32m[  OK  ]\033[0m";
@@ -43,7 +41,6 @@ namespace Status
         constexpr std::string_view RETRYING = " \033[1;35m[ RETR ]\033[0m";
     }
 
-    // --- Option 3: Minimal Single Symbols ---
     namespace Symbol
     {
         constexpr std::string_view SUCCESS = " \033[1;32m[✔]\033[0m";
@@ -76,6 +73,7 @@ namespace Terminal
     {
 #ifdef _WIN32
         SetConsoleOutputCP(CP_UTF8);
+        SetConsoleCP(CP_UTF8);
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
         if (hOut != INVALID_HANDLE_VALUE)
         {
@@ -84,6 +82,16 @@ namespace Terminal
             {
                 dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
                 SetConsoleMode(hOut, dwMode);
+            }
+        }
+        HANDLE hErr = GetStdHandle(STD_ERROR_HANDLE);
+        if (hErr != INVALID_HANDLE_VALUE)
+        {
+            DWORD dwMode = 0;
+            if (GetConsoleMode(hErr, &dwMode))
+            {
+                dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+                SetConsoleMode(hErr, dwMode);
             }
         }
 #endif
@@ -141,7 +149,7 @@ namespace Terminal
     }
     inline void stat_carriage(const std::string label, const std::string_view value)
     {
-        std::cout << "\r" << Color::CYAN << std::left << std::setw(50)
+        std::cout << "\033[2K\r" << Color::CYAN << std::left << std::setw(50)
                   << label << Color::RESET << std::left << std::setw(30) << value << std::right;
     }
 
@@ -163,7 +171,7 @@ namespace Terminal
             percentage = 1.0f;
         int pos = static_cast<int>(bar_width * percentage);
 
-        std::cout << "\r" << label_color << std::setw(30) << std::left << label
+        std::cout << "\033[2K\r" << label_color << std::setw(30) << std::left << label
                   << Color::RESET << Color::CYAN << "[" << bar_color;
 
         for (int i = 0; i < bar_width; ++i)
@@ -182,25 +190,6 @@ namespace Terminal
                   << Color::RESET << std::right << std::flush;
     }
 
-    // template <typename Action>
-    // bool run_with_progress(const std::string &label, Action action)
-    // {
-    // auto task = std::async(std::launch::async, action);
-    // size_t progress = 5;
-
-    // while(task.wait_for(std::chrono::milliseconds(90)) != std::future_status::ready)
-    // {
-    //     draw_progress_bar(progress, 100, label);
-    //     if(progress < 95)
-    //         progress++;
-    // }
-
-    // bool success = task.get();
-    // draw_progress_bar(100, 100, label);
-    // std::cout << "\n";
-    // return success;
-    // return false;
-    // }
 
     inline void run_with_progress(std::string label, uint8_t progress)
     {

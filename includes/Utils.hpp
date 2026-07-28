@@ -13,7 +13,7 @@
 #include <filesystem>
 #include <system_error>
 
-#include "Type.hpp"
+#include "Config.hpp"
 #include "Node.hpp"
 #include "Terminal.hpp"
 #include "ByteStream.hpp"
@@ -55,6 +55,7 @@ namespace Utils
     uint8_t min_byte_count(uint64_t nc);
     bool uint16_t_to_bytestream(uint16_t nc, ByteStream &bs);
     bool read_string(FileReader *reader, std::string &out_string);
+    bool read_string2(FileReader *reader, std::string &out_string);
     bool frequency_to_stream(std::array<TYPE_FREQUENCY, BYTE_SIZE> &freq, ByteStream &bs, uint8_t min_bytes);
     void build_frequency_map(std::array<TYPE_FREQUENCY, BYTE_SIZE> &freq, uint16_t &num_unique_chars, uint8_t &min_num_bytes, FileReader *reader, bool show_terminal = true);
     Node *build_huffman_tree(std::array<TYPE_FREQUENCY, BYTE_SIZE> &freq);

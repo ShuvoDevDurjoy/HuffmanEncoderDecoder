@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Type.hpp"
+#include "Config.hpp"
 
 struct Node
 {
@@ -20,6 +20,12 @@ struct Node
         this->frequency = frequency;
         this->left = left;
         this->right = right;
+    }
+
+    ~Node()
+    {
+        delete left;
+        delete right;
     }
 
     bool is_leaf() const

@@ -48,10 +48,12 @@ bool Encoder::_encode_content(std::array<ByteStream, BYTE_SIZE> &codes, ByteStre
 }
 
 bool Encoder::_encode(EncodedContent& content){
+    ByteStream file_name_size;
+    Utils::uint16_t_to_bytestream(content.file_name_size, file_name_size);
     out_file->write(content.magic_code_size);
     out_file->write(content.magic_code);
     out_file->write(content.version_number);
-    out_file->write(content.file_name_size);
+    out_file->write(file_name_size);
     out_file->write(content.file_name_bytes);
     out_file->write(content.num_unique_chars);
     out_file->write(content.max_freq_byte_size);
@@ -109,6 +111,8 @@ bool Encoder::encode(std::string in_file, std::string out_file)
     this->_encode_content(huffman_codes, content.content_codes);
     content.padding = content.content_codes.get_pad();
     success = _encode(content);
+
+    delete root;
 
     this->in_file->close();
     this->out_file->close();

@@ -68,17 +68,44 @@ void ByteStream::push_stream(ByteStream bs, bool sync){
     }
 }
 
-void ByteStream::test_state()
+
+bool ByteStream::is_empty()
 {
-    // std::cout << std::endl;
-    int s = data.size();
-    // std::cout << "Current States: "<<s << std::endl;
-    while (s)
+    return data.size() == 0;
+}
+
+void ByteStream::padding_back(uint8_t padding)
+{
+    if (!is_empty())
     {
-        data.front().to_string();
-        data.push_back(data.front());
-        data.pop_front();
-        s--;
+        data.back().shift_right(padding);
     }
-    // std::cout << std::endl;
+}
+
+size_t ByteStream::get_pad()
+{
+    if (!is_empty())
+    {
+        return data.back().padding;
+    }
+    return 0;
+}
+
+size_t ByteStream::size()
+{
+    return data.size();
+}
+
+void ByteStream::to_string()
+{
+    size_t t = data.size();
+
+    while (t)
+    {
+        std::cout << " " << std::bitset<8>(static_cast<int>(data.front().get_byte())) << " and pad: " << (int)data.front().padding << " ";
+        Byte front = data.front();
+        data.pop_front();
+        push_byte(front);
+        t--;
+    }
 }

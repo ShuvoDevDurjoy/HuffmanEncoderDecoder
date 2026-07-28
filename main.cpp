@@ -21,19 +21,19 @@ namespace
 
     bool validate_input_file(const std::string &input_file)
     {
-        if(input_file.empty())
+        if (input_file.empty())
         {
             Terminal::error("input file path is required");
             return false;
         }
 
-        if(!Utils::file_exists(input_file))
+        if (!Utils::file_exists(input_file))
         {
             Terminal::error("input file not found: " + input_file);
             return false;
         }
 
-        if(Utils::file_size(input_file) == 0)
+        if (Utils::file_size(input_file) == 0)
         {
             Terminal::error("empty files are not supported by this encoder");
             return false;
@@ -44,13 +44,13 @@ namespace
 
     bool validate_output_file(const std::string &output_file)
     {
-        if(output_file.empty())
+        if (output_file.empty())
         {
             Terminal::error("output file path is required");
             return false;
         }
 
-        if(!Utils::output_parent_exists(output_file))
+        if (!Utils::output_parent_exists(output_file))
         {
             Terminal::error("output directory does not exist: " + output_file);
             return false;
@@ -67,7 +67,7 @@ namespace
         Terminal::stat("Output", output_file);
         Terminal::stat("Input Size", Utils::format_file_size(Utils::file_size(input_file)));
 
-        if(Utils::file_exists(output_file))
+        if (Utils::file_exists(output_file))
         {
             Terminal::warning("output file exists and will be overwritten");
         }
@@ -93,7 +93,7 @@ namespace
         bool success;
         success = Utils::encoded_output_path(input_file, output_file);
 
-        if(!validate_input_file(input_file) || !validate_output_file(output_file))
+        if (!validate_input_file(input_file) || !validate_output_file(output_file))
             return false;
 
         Terminal::banner();
@@ -121,17 +121,25 @@ namespace
         input_file = Utils::trim(input_file);
         output_file = Utils::trim(output_file);
 
-        if(!validate_input_file(input_file) || !Utils::dir_exists(output_file))
+        if (!validate_input_file(input_file))
+        {
+            Terminal::error("decoding failed, Output dir Does not exists");
             return false;
-
+        }
         Terminal::banner();
+        if (!Utils::dir_exists(output_file))
+        {
+            output_file = std::filesystem::current_path().string();
+            Terminal::warning("Output Dir Does not exists. Defaulting to runtime Directory");
+        }
+
         print_start_summary("Decode", input_file, output_file);
 
         Huffman huffman;
         std::string out_file_name;
         bool success = huffman.decode(input_file, output_file, out_file_name);
 
-        if(!success)
+        if (!success)
         {
             Terminal::error("decoding failed");
             return false;
@@ -146,7 +154,7 @@ namespace
     {
         Terminal::banner();
 
-        while(true)
+        while (true)
         {
             Terminal::section("Interactive Mode");
             std::cout << "  1. Encode a file\n";
@@ -154,13 +162,13 @@ namespace
             std::cout << "  0. Exit\n\n";
 
             std::string choice = Utils::to_lower(Utils::trim(Terminal::prompt("Select option:")));
-            if(std::cin.eof())
+            if (std::cin.eof())
                 return true;
 
-            if(choice == "0" || choice == "q" || choice == "quit" || choice == "exit")
+            if (choice == "0" || choice == "q" || choice == "quit" || choice == "exit")
                 return true;
 
-            if(choice == "1" || choice == "e" || choice == "encode")
+            if (choice == "1" || choice == "e" || choice == "encode")
             {
                 std::string input_file = Terminal::prompt("Input file:");
                 encode_file(input_file);
@@ -168,7 +176,7 @@ namespace
                 continue;
             }
 
-            if(choice == "2" || choice == "d" || choice == "decode")
+            if (choice == "2" || choice == "d" || choice == "decode")
             {
                 std::string input_file = Terminal::prompt("Encoded file:");
                 std::string output_file = Terminal::prompt("Output file:");
@@ -183,26 +191,26 @@ namespace
     }
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     Terminal::init();
 
-    if(argc == 1)
+    if (argc == 1)
     {
         return interactive_mode() ? 0 : EXIT_OPERATION_FAILED;
     }
 
     std::string command = Utils::to_lower(argv[1]);
 
-    if(command == "-h" || command == "--help" || command == "help")
+    if (command == "-h" || command == "--help" || command == "help")
     {
         print_usage();
         return 0;
     }
 
-    if(command == "encode")
+    if (command == "encode")
     {
-        if(argc != 3)
+        if (argc != 3)
         {
             print_usage();
             return EXIT_USAGE;
@@ -211,9 +219,9 @@ int main(int argc, char* argv[])
         return encode_file(argv[2]) ? 0 : EXIT_OPERATION_FAILED;
     }
 
-    if(command == "decode")
+    if (command == "decode")
     {
-        if(argc != 4)
+        if (argc != 4)
         {
             print_usage();
             return EXIT_USAGE;

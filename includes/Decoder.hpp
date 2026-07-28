@@ -11,7 +11,7 @@
 #include "ByteStream.hpp"
 #include "ByteWriter.hpp"
 #include "FileReader.hpp"
-#include "Type.hpp"
+#include "Config.hpp"
 #include "Utils.hpp"
 
 class Decoder
@@ -20,10 +20,11 @@ private:
     ByteWriter *writer;
     FileReader *reader;
     uint8_t version_number = 1;
-    std::string decoder_magic_code = "HUFF";
+    std::string decoder_magic_code = MAGIC_CODE;
 
 public:
     Decoder();
+    ~Decoder();
 
 private:
     bool pretest(std::string &in_file, std::string &out_dir);

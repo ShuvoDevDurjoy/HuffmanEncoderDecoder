@@ -6,6 +6,12 @@ Decoder::Decoder()
     reader = new FileReader();
 }
 
+Decoder::~Decoder()
+{
+    delete writer;
+    delete reader;
+}
+
 bool Decoder::pretest(std::string &in_file, std::string &out_dir)
 {
     if (!Utils::file_exists(in_file) || !Utils::dir_exists(out_dir))
@@ -34,7 +40,7 @@ bool Decoder::read_metadata(const std::string &out_dir, std::string &out_path)
         return on_fail();
 
     std::string out_file_name;
-    if (!Utils::read_string(reader, out_file_name))
+    if (!Utils::read_string2(reader, out_file_name))
         return on_fail();
 
     out_path = (std::filesystem::path(out_dir) / out_file_name).string();
@@ -195,11 +201,16 @@ bool Decoder::decode(std::string in_file, std::string &out_dir, std::string &out
     ByteStream bs;
     _read_code_stream(bs);
     if (bs.size() == 0)
+    {
+        delete root;
         return on_fail();
+    }
 
     bs.padding_back(content.padding);
     success = _decode(bs, root, content.content_codes);
     success = writer->write(content.content_codes, true);
+
+    delete root;
 
     writer->close();
     reader->close();

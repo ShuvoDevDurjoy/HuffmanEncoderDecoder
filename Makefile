@@ -1,3 +1,4 @@
+# Cross-platform Makefile (Supports Linux, macOS/Darwin, and Windows with g++/clang++)
 CXX ?= g++
 CXXFLAGS ?= -std=c++20 -Wall -Wextra -O2
 TARGET := huff

@@ -18,7 +18,7 @@
 #include "ByteWriter.hpp"
 #include "ByteStream.hpp"
 #include "FileReader.hpp"
-#include "Type.hpp"
+#include "Config.hpp"
 
 class Huffman
 {
@@ -34,6 +34,13 @@ public:
         enc = new Encoder();
         dec = new Decoder();
         writer = new ByteWriter();
+    }
+
+    ~Huffman(){
+        delete reader;
+        delete enc;
+        delete dec;
+        delete writer;
     }
 
 public:

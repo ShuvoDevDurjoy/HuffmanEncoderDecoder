@@ -15,7 +15,7 @@ struct EncodedContent{
     uint8_t magic_code_size;
     ByteStream magic_code;
     uint8_t version_number;
-    uint8_t file_name_size;
+    uint16_t file_name_size;
     ByteStream file_name_bytes;
     ByteStream num_unique_chars;
     uint8_t max_freq_byte_size;
