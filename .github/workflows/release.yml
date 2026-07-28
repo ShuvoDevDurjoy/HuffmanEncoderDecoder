@@ -47,7 +47,7 @@ jobs:
 
       - name: Build
         shell: cmd
-        run: cl /std:c++20 /EHsc /O2 main.cpp /Fe:huff.exe
+        run: cl /std:c++20 /EHsc /O2 main.cpp src/*.cpp /Fe:huff.exe
 
       - name: Package
         shell: pwsh

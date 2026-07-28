@@ -1,9 +1,10 @@
 #pragma once
 
-#include <cstdint>
-#include <vector>
-#include "ByteStream.hpp"
 #include <array>
+#include <vector>
+#include <cstdint>
+
+#include "ByteStream.hpp"
 
 struct CharAndFrequency{
     uint8_t c = 0;
@@ -11,9 +12,10 @@ struct CharAndFrequency{
 };
 
 struct EncodedContent{
+    uint8_t magic_code_size;
     ByteStream magic_code;
     uint8_t version_number;
-    uint16_t file_name_size;
+    uint8_t file_name_size;
     ByteStream file_name_bytes;
     ByteStream num_unique_chars;
     uint8_t max_freq_byte_size;

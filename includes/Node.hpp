@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Utils/Type.hpp"
+#include "Type.hpp"
 
 struct Node
 {

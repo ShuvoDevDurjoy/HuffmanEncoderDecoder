@@ -6,8 +6,8 @@ BINDIR ?= $(PREFIX)/bin
 
 all: $(TARGET)
 
-$(TARGET): main.cpp includes/*.hpp Utils/*.hpp src/*.cpp
-	$(CXX) $(CXXFLAGS) main.cpp -o $(TARGET)
+$(TARGET): main.cpp includes/*.hpp src/*.cpp
+	$(CXX) $(CXXFLAGS) main.cpp src/*.cpp -o $(TARGET)
 
 install: $(TARGET)
 	install -d "$(DESTDIR)$(BINDIR)"

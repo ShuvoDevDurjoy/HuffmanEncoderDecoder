@@ -1,17 +1,22 @@
 #pragma once
 
-#include <cstdint>
-#include <fstream>
-#include <iostream>
 #include <array>
-#include "../Utils/Type.hpp"
+#include <cstdint>
+#include <iostream>
+#include <fstream>
+#include <filesystem>
 
-class FileReader{
+#include "Type.hpp"
+#include "Utils.hpp"
+
+class FileReader
+{
 private:
     std::ifstream file;
     std::array<TYPE_CHAR, BUFFER_SIZE> buffer;
     std::streamsize bytes_read = 0;
     std::size_t index = 0;
+    std::filesystem::path file_path;
 
 private:
     bool can_read();
@@ -20,21 +25,12 @@ private:
 public:
     FileReader() {};
 
+    bool get_file_path(std::filesystem::path &path);
     bool is_open() const;
     void close();
     bool open(std::string file_name);
-    bool reset(){
-        if(!is_open()){
-            return false;
-        };
-        file.clear();
-        file.seekg(0, std::ios::beg);
-        bytes_read = 0;
-        index = 0;
-        return !file.fail() && file.tellg() == std::streampos(0);
-    }
-
-public:
+    bool reset();
     bool read_chunk();
     bool next_byte(uint8_t &byte);
+    size_t size();
 };

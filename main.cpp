@@ -3,8 +3,6 @@
 
 #include "includes/Huffman.hpp"
 #include "includes/Terminal.hpp"
-#include "src/ByteStream.cpp"
-#include "src/Encoder.cpp"
 
 namespace
 {
@@ -90,7 +88,10 @@ namespace
     bool encode_file(std::string input_file)
     {
         input_file = Utils::trim(input_file);
-        std::string output_file = Utils::encoded_output_path(input_file);
+        std::string output_file = "";
+
+        bool success;
+        success = Utils::encoded_output_path(input_file, output_file);
 
         if(!validate_input_file(input_file) || !validate_output_file(output_file))
             return false;
@@ -99,11 +100,12 @@ namespace
         print_start_summary("Encode", input_file, output_file);
 
         Huffman huffman;
-        bool success = Terminal::run_with_progress("Encoding", [&](){
-            return huffman.encode(input_file, output_file);
-        });
+        // bool success = Terminal::run_with_progress("Encoding", [&](){
+        //     return huffman.encode(input_file, output_file);
+        // });
+        success = huffman.encode(input_file, output_file);
 
-        if(!success || !Utils::file_exists(output_file))
+        if (!success || !Utils::file_exists(output_file))
         {
             Terminal::error("encoding failed");
             return false;
@@ -119,25 +121,24 @@ namespace
         input_file = Utils::trim(input_file);
         output_file = Utils::trim(output_file);
 
-        if(!validate_input_file(input_file) || !validate_output_file(output_file))
+        if(!validate_input_file(input_file) || !Utils::dir_exists(output_file))
             return false;
 
         Terminal::banner();
         print_start_summary("Decode", input_file, output_file);
 
         Huffman huffman;
-        bool success = Terminal::run_with_progress("Decoding", [&](){
-            return huffman.decode(input_file, output_file);
-        });
+        std::string out_file_name;
+        bool success = huffman.decode(input_file, output_file, out_file_name);
 
-        if(!success || !Utils::file_exists(output_file))
+        if(!success)
         {
             Terminal::error("decoding failed");
             return false;
         }
 
         Terminal::success("decoding complete");
-        print_result_summary(input_file, output_file);
+        print_result_summary(input_file, out_file_name);
         return true;
     }
 
@@ -184,6 +185,8 @@ namespace
 
 int main(int argc, char* argv[])
 {
+    Terminal::init();
+
     if(argc == 1)
     {
         return interactive_mode() ? 0 : EXIT_OPERATION_FAILED;

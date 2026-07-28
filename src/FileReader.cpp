@@ -1,7 +1,43 @@
 #include "../includes/FileReader.hpp"
 
+bool FileReader::get_file_path(std::filesystem::path &path)
+{
+    if (is_open())
+    {
+        path = this->file_path;
+        return true;
+    }
+
+    return false;
+}
+
+bool FileReader::reset()
+{
+    if (!is_open())
+    {
+        return false;
+    }
+    file.clear();
+    file.seekg(0, std::ios::beg);
+    bytes_read = 0;
+    index = 0;
+    return !file.fail() && file.tellg() == std::streampos(0);
+}
+
+size_t FileReader::size()
+{
+    if (is_open())
+    {
+        return std::filesystem::file_size(this->file_path);
+    }
+    return 0;
+}
+
 bool FileReader::open(std::string file_name){
+    if(!Utils::file_exists(file_name))
+        return false;
     file.open(file_name, std::ios::in | std::ios::binary);
+    this->file_path = std::filesystem::path(file_name);
     bytes_read = 0;
     index = 0;
     return is_open();
@@ -23,6 +59,7 @@ bool FileReader::read_chunk()
 void FileReader::close(){
     if(file.is_open()){
         this->file.close();
+        file_path = "";
     }
 }
 

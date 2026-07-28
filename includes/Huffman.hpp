@@ -1,23 +1,24 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
 #include <queue>
-#include <unordered_map>
-#include <string>
-#include <fstream>
 #include <array>
-#include "Utils.hpp"
-#include "../Utils/Type.hpp"
-#include "FileReader.hpp"
-#include "../src/FileReader.cpp"
+#include <vector>
+#include <string>
 #include <cstdint>
+#include <fstream>
+#include <iostream>
+#include <unordered_map>
+
+#include "Node.hpp"
 #include "Byte.hpp"
+#include "Utils.hpp"
+#include "Decoder.hpp"
+#include "Encoder.hpp"
+#include "Terminal.hpp"
 #include "ByteWriter.hpp"
 #include "ByteStream.hpp"
-#include "Encoder.hpp"
-#include "Node.hpp"
-#include "Decode.hpp"
+#include "FileReader.hpp"
+#include "Type.hpp"
 
 class Huffman
 {
@@ -25,23 +26,18 @@ private:
     FileReader *reader;
     Encoder *enc;
     ByteWriter *writer;
-    Decode *dec;
+    Decoder *dec;
 
 public:
     Huffman(){
         reader = new FileReader();
         enc = new Encoder();
-        dec = new Decode();
+        dec = new Decoder();
         writer = new ByteWriter();
     }
 
 public:
-    bool encode(std::string in_file_name, std::string out_file_name){
-        return this->enc->encode(in_file_name, out_file_name);
-    }
+    bool encode(std::string in_file_name, std::string out_file_name);
 
-    bool decode(std::string in_file_name, std::string out_file_name){
-        return dec->decode(in_file_name, out_file_name);
-    }
-
+    bool decode(std::string in_file_name, std::string out_dir, std::string &out_file_name);
 };
