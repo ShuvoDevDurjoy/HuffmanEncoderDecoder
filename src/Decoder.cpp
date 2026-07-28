@@ -37,7 +37,7 @@ bool Decoder::read_metadata(const std::string &out_dir, std::string &out_path)
     if (!Utils::read_string(reader, out_file_name))
         return on_fail();
 
-    out_path = std::filesystem::path(out_dir) / out_file_name;
+    out_path = (std::filesystem::path(out_dir) / out_file_name).string();
     writer->open(out_path);
 
     return true;

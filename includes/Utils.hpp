@@ -37,7 +37,7 @@ namespace Utils
     std::string get_truncated_file_name_from_path(const std::filesystem::path &p);
     std::string to_lower(std::string value);
     bool file_exists(const std::string &path);
-    bool file_exists(std::filesystem::path &path);
+    bool file_exists(const std::filesystem::path &path);
     bool dir_exists(const std::string &path);
     bool convert_string_to_stream(const std::string content, ByteStream &bs);
     bool convert_stream_to_string(ByteStream &bs, std::string &st);

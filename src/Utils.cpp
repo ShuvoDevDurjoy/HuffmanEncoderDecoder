@@ -54,7 +54,7 @@ namespace Utils
         return std::filesystem::exists(path, ec) && std::filesystem::is_regular_file(path, ec);
     }
 
-    bool file_exists(std::filesystem::path &path)
+    bool file_exists(const std::filesystem::path &path)
     {
         std::error_code ec;
         return std::filesystem::exists(path, ec) && std::filesystem::is_regular_file(path, ec);
@@ -112,7 +112,7 @@ namespace Utils
 
     bool parent_dir(const std::filesystem::path &path, std::filesystem::path &parent_path)
     {
-        if (output_parent_exists(path))
+        if (output_parent_exists(path.string()))
         {
             parent_path = path.parent_path();
             return true;
