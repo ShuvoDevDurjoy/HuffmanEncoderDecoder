@@ -70,7 +70,18 @@ make
 make install
 make clean
 ```
+# Download Linux
+- ## Version 1.0.2
+- [huff-linux-x86_64.targ.gz](https://github.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/releases/download/v1.0.2/huff-linux-x86_64.tar.gz)
+- [huff-linux-x86_64.tar.gz.sha256](https://github.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/releases/download/v1.0.2/huff-linux-x86_64.tar.gz.sha256)
+# Download Windows
+- ## Version 1.0.2
+- [huff-windows-x86_64.zip](https://github.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/releases/download/v1.0.2/huff-windows-x86_64.zip)
+- [huff-windows-x86_64.zip.sha256](https://github.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/releases/download/v1.0.2/huff-windows-x86_64.zip.sha256)
 
+# Source Code
+- [Source Code Zip](https://github.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/archive/refs/tags/v1.0.2.zip)
+- [Source Code tar.gz](https://github.com/ShuvoDevDurjoy/HuffmanEncoderDecoder/archive/refs/tags/v1.0.2.tar.gz)
 ## Release
 
 Create and push a version tag to publish a release binary:
