@@ -22,7 +22,7 @@ bool Byte::is_full()
     return padding == 0;
 }
 
-uint8_t Byte::get_byte()
+uint8_t Byte::get_byte() const
 {
     return byte << padding;
 }

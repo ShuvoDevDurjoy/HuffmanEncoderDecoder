@@ -154,16 +154,23 @@ namespace Utils
 
     bool encoded_output_path(const std::filesystem::path &input_file, std::string &output_file)
     {
-        std::filesystem::path parent_path;
-        if (file_exists(input_file) && parent_dir(input_file, parent_path))
+        std::error_code ec;
+        const bool is_directory = std::filesystem::is_directory(input_file, ec);
+        ec.clear();
+        const bool is_regular_file = std::filesystem::is_regular_file(input_file, ec);
+        if (is_directory || is_regular_file)
         {
+            const std::filesystem::path parent_path = input_file.parent_path();
+            const std::string base_name = is_directory ? input_file.filename().string() : get_truncated_file_name(input_file);
+            if (base_name.empty())
+                return false;
             if (parent_path.empty())
             {
-                output_file = get_truncated_file_name(input_file) + ENCODER_FILE_EXTENSION;
+                output_file = base_name + ENCODER_FILE_EXTENSION;
             }
             else
             {
-                output_file = (parent_path / (get_truncated_file_name(input_file) + ENCODER_FILE_EXTENSION)).string();
+                output_file = (parent_path / (base_name + ENCODER_FILE_EXTENSION)).string();
             }
             return true;
         }

@@ -41,21 +41,31 @@ $env:HUFF_VERSION = "v1.0.0"; irm https://raw.githubusercontent.com/ShuvoDevDurj
 ## Usage
 
 ```bash
-huff encode <file>
-huff decode <file.huff> <output-file>
+huff encode <file-or-folder>
+huff decode <file.huff> <output-directory>
 huff
 ```
 
-Encoding writes `<file>.huff` next to the input file.
+Encoding writes a `.huff` file next to the input. A folder is stored as one archive, including its nested directory and file names.
 
 ```bash
 huff encode notes.txt
+huff encode project/
 ```
 
-Decoding requires the encoded input file and an output path.
+Decoding requires the encoded input file and an output directory. For a folder archive, the original folder is recreated inside that directory.
 
 ```bash
-huff decode notes.txt.huff notes.decoded.txt
+huff decode notes.txt.huff restored/
+huff decode project.huff restored/
+```
+
+Payload data is processed in fixed-size buffers, so memory use does not grow with file size. Folder metadata uses memory proportional to the number and total length of entry names. Encoding scans file contents twice to build a Huffman table and then write the encoded stream. Folder archives are limited to 100,000 entries and 16 MiB of combined paths and symlink targets. Relative symlinks that stay within the folder are preserved; absolute or escaping symlinks and special filesystem entries are not supported.
+
+On Linux, you can make a long-running operation yield more to other work by lowering its scheduling priority:
+
+```bash
+nice -n 10 ionice -c2 -n7 huff encode project/
 ```
 
 Run `huff` with no arguments to use the interactive mode.

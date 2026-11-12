@@ -29,7 +29,7 @@ public:
 
     bool is_full();
 
-    uint8_t get_byte();
+    uint8_t get_byte() const;
 
     bool pop_bit_front(bool &bit);
 

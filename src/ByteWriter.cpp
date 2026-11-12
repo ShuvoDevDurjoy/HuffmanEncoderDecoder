@@ -45,6 +45,16 @@ bool ByteWriter::write(uint8_t &c)
     return _write(c);
 }
 
+bool ByteWriter::write_buffer(const uint8_t *buffer, size_t size)
+{
+    if (!is_open())
+    {
+        return false;
+    }
+    file.write(reinterpret_cast<const char *>(buffer), static_cast<std::streamsize>(size));
+    return file.good();
+}
+
 bool ByteWriter::write(ByteStream &bs, bool show_terminal)
 {
     size_t read = 0;

@@ -25,5 +25,7 @@ public:
 
     bool write(uint8_t &c);
 
+    bool write_buffer(const uint8_t *buffer, size_t size);
+
     bool write(ByteStream &bs, bool show_terminal = false);
 };

@@ -29,9 +29,11 @@ public:
 
     void padding_back(uint8_t padding);
 
-    size_t get_pad();
+    size_t get_pad() const;
 
-    size_t size();
+    bool get_bit(size_t index, bool &bit) const;
+
+    size_t size() const;
 
     void to_string();
 };

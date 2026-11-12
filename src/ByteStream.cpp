@@ -82,16 +82,29 @@ void ByteStream::padding_back(uint8_t padding)
     }
 }
 
-size_t ByteStream::get_pad()
+size_t ByteStream::get_pad() const
 {
-    if (!is_empty())
+    if (!data.empty())
     {
         return data.back().padding;
     }
     return 0;
 }
 
-size_t ByteStream::size()
+bool ByteStream::get_bit(size_t index, bool &bit) const
+{
+    const size_t bit_count = data.size() * 8 - (data.empty() ? 0 : data.back().padding);
+    if (index >= bit_count)
+    {
+        return false;
+    }
+
+    const uint8_t byte = data[index / 8].get_byte();
+    bit = ((byte >> (7 - (index % 8))) & 1) != 0;
+    return true;
+}
+
+size_t ByteStream::size() const
 {
     return data.size();
 }

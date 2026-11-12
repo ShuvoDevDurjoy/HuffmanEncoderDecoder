@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <iostream>
 #include <algorithm>
+#include <filesystem>
+#include <vector>
 
 #include "Content.hpp"
 #include "Byte.hpp"
@@ -25,7 +27,7 @@ private:
     uint8_t version = 1;
     uint16_t num_unique_bits = 0;
 
-    std::array<TYPE_CHAR, BYTE_SIZE> frequencies;
+    std::array<TYPE_FREQUENCY, BYTE_SIZE> frequencies;
     std::array<ByteStream, BYTE_SIZE> codes;
     std::uint8_t padding = 0;
 private:
@@ -34,7 +36,10 @@ private:
 
 private:
     bool _encode(EncodedContent &content);
-    bool _encode_content(std::array<ByteStream, BYTE_SIZE> &codes, ByteStream &bs);
+    bool _encode_content(std::array<ByteStream, BYTE_SIZE> &codes, size_t total_bytes);
+    bool _encode_directory(const std::filesystem::path &directory, const std::string &output_path);
+    uint8_t _get_padding(const std::array<TYPE_FREQUENCY, BYTE_SIZE> &freq,
+                         const std::array<ByteStream, BYTE_SIZE> &codes);
 
 public:
     Encoder()

@@ -13,13 +13,13 @@ namespace
     {
         Terminal::banner();
         Terminal::section("Usage");
-        std::cout << "  huff encode <file>\n";
-        std::cout << "  huff decode <file.huff> <output-file>\n";
+        std::cout << "  huff encode <file-or-folder>\n";
+        std::cout << "  huff decode <file.huff> <output-directory>\n";
         std::cout << "  huff\n\n";
         Terminal::info("Run without arguments to start interactive mode.");
     }
 
-    bool validate_input_file(const std::string &input_file)
+    bool validate_input_file(const std::string &input_file, bool allow_directory = false)
     {
         if (input_file.empty())
         {
@@ -27,13 +27,17 @@ namespace
             return false;
         }
 
-        if (!Utils::file_exists(input_file))
+        std::error_code error;
+        const bool is_directory = std::filesystem::is_directory(input_file, error);
+        error.clear();
+        const bool is_regular_file = std::filesystem::is_regular_file(input_file, error);
+        if (!is_regular_file && !(allow_directory && is_directory))
         {
             Terminal::error("input file not found: " + input_file);
             return false;
         }
 
-        if (Utils::file_size(input_file) == 0)
+        if (is_regular_file && Utils::file_size(input_file) == 0)
         {
             Terminal::error("empty files are not supported by this encoder");
             return false;
@@ -65,7 +69,10 @@ namespace
         Terminal::section(mode);
         Terminal::stat("Input", input_file);
         Terminal::stat("Output", output_file);
-        Terminal::stat("Input Size", Utils::format_file_size(Utils::file_size(input_file)));
+        if (std::filesystem::is_directory(input_file))
+            Terminal::stat("Input Size", "folder");
+        else
+            Terminal::stat("Input Size", Utils::format_file_size(Utils::file_size(input_file)));
 
         if (Utils::file_exists(output_file))
         {
@@ -75,6 +82,25 @@ namespace
 
     void print_result_summary(const std::string &input_file, const std::string &output_file)
     {
+        if (std::filesystem::is_directory(output_file))
+        {
+            Terminal::section("Result");
+            Terminal::stat("Input Size", Utils::format_file_size(Utils::file_size(input_file)));
+            Terminal::stat("Output", "folder");
+            Terminal::stat("Output Path", output_file);
+            return;
+        }
+
+        if (std::filesystem::is_directory(input_file))
+        {
+            Terminal::section("Result");
+            Terminal::stat("Input", "folder");
+            Terminal::stat("Output Size", Utils::format_file_size(Utils::file_size(output_file)));
+            Terminal::stat("Size Change", "n/a for folders");
+            Terminal::stat("Output File", output_file);
+            return;
+        }
+
         uintmax_t input_size = Utils::file_size(input_file);
         uintmax_t output_size = Utils::file_size(output_file);
 
@@ -93,7 +119,7 @@ namespace
         bool success;
         success = Utils::encoded_output_path(input_file, output_file);
 
-        if (!validate_input_file(input_file) || !validate_output_file(output_file))
+        if (!validate_input_file(input_file, true) || !validate_output_file(output_file))
             return false;
 
         Terminal::banner();
@@ -127,10 +153,12 @@ namespace
             return false;
         }
         Terminal::banner();
-        if (!Utils::dir_exists(output_file))
+        std::error_code error;
+        std::filesystem::create_directories(output_file, error);
+        if (error || !std::filesystem::is_directory(output_file))
         {
-            output_file = std::filesystem::current_path().string();
-            Terminal::warning("Output Dir Does not exists. Defaulting to runtime Directory");
+            Terminal::error("could not create output directory: " + output_file);
+            return false;
         }
 
         print_start_summary("Decode", input_file, output_file);
@@ -179,7 +207,7 @@ namespace
             if (choice == "2" || choice == "d" || choice == "decode")
             {
                 std::string input_file = Terminal::prompt("Encoded file:");
-                std::string output_file = Terminal::prompt("Output file:");
+                std::string output_file = Terminal::prompt("Output directory:");
                 decode_file(input_file, output_file);
                 std::cout << "\n";
                 continue;
